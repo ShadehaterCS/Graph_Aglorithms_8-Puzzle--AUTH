@@ -14,42 +14,46 @@ int iterations;
 */
 template <typename T>
 int generalSearch
-	(State& initial, State& goal, T& frontier) {
+(State& initial, State& goal, T& frontier) {
 	//initialize member variables
 	iterations = 0;
 	frontier.push(initial);
-	std::set<State> closed;
+	std::set<std::string> closed;
 
 	while (!frontier.empty()) {
-		//
-		auto possibleSolution = frontier.top();
+		State possibleSolution = frontier.top();
 		frontier.pop();
-		
+
 		//check if current state is the goal state
 		if (possibleSolution == goal) {
 			std::cout << possibleSolution.toString() << std::endl;
 			auto v = possibleSolution.path();
-			for (auto s : v) {
-				std::cout << s.toString() << std::endl;
-			}
+
 			std::cout << initial.toString() << std::endl;
+			std::cout << possibleSolution.toString() << std::endl;
+			std::cout << iterations << std::endl;
+
 			return iterations;
 		}
 
 		//if state not in the closed set then it's expanded
-		if (closed.count(possibleSolution) == 0) {
-				closed.insert(possibleSolution);
-
+		if (closed.count(possibleSolution.stringrepresentation) == 0) {
+			closed.insert(possibleSolution.stringrepresentation);
 			std::vector<State> children = possibleSolution.expand();
 			for (State state : children) {
 				frontier.push(state);
 			}
 		}
-
 		iterations++;
 	}
-
+	std::cout << "Solution not found" << std::endl;
 	return -1;
+}
+
+int BestFS(State initial, State goal) {
+	using namespace shd;
+	PriorityQueue queue;
+	return generalSearch(initial, goal, queue);
 }
 
 int BFS(State initial, State goal) {
@@ -62,27 +66,22 @@ int DFS(State initial, State goal) {
 	return generalSearch(initial, goal, frontier);
 }
 
-int main(){
+int main() {
 	int initNums[9] = { 3, 6, 0, 1, 4, 2, 7, 5, 8 };
 	int goalNums[9] = { 1, 2, 3, 4, 5, 6, 7, 8, 0 };
 
 	iterations = 0;
-	State initial(3, initNums);
-	State goal(3, goalNums);
-
+	State goal(3, goalNums, nullptr);
+	State initial(3, initNums, &goal);
 
 	std::cout << "Starting state:\n" + initial.toString() << std::endl;
-	
-	DFS(initial, goal);
 
+	DFS(initial, goal);
+	BFS(initial, goal);
+	BestFS(initial, goal);
 
 	//std::cout<<BFS(initial, goal);
 
 	std::cin.get();
 	return 0;
 }
-
-
-
-
-

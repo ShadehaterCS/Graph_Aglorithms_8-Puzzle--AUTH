@@ -4,6 +4,7 @@
 #include <string>
 class State
 {
+	//Used to store the empty tile's position in the array 
 	struct coordinates { int x; int y; };
 
 private:
@@ -11,13 +12,15 @@ public:
 	std::string stringrepresentation;
 	int* tiles;
 	int size = 0;
+	int heuristic;
+
 	State* parent;
+	State* goal;
 	coordinates emptyTile;
 
 	State();
-	State(int dimensions, int* numbers);
+	State(int dimensions, int* numbers, State* goal);
 	State(const State& state);
-
 	~State();
 
 	std::vector<State> expand();
@@ -26,15 +29,17 @@ public:
 
 	bool isSolvable();
 
-	//heuristic value
-	int tilesOutOfPlace();
+	//heuristic calculation
+	int const tilesOutOfPlace();
 
 	//Operator overloads
 	State& operator = (const State& state);
 	bool operator < (const State& rhs);
 	friend bool operator == (const State& lhs, const State& rhs);
 	friend bool operator <(const State& lhs, const State& rhs);
-	friend bool operator != (const State& lhs, const State& rhs);
+	friend bool operator > (const State& lhs, const State& rhs) {
+		return lhs.heuristic < rhs.heuristic;
+	}
 
 	coordinates getEmptyTileCoordinates() { return emptyTile; }
 
@@ -48,6 +53,4 @@ public:
 	bool moveDown();
 	bool moveLeft();
 	bool moveRight();
-
-	void testMoves();
 };
