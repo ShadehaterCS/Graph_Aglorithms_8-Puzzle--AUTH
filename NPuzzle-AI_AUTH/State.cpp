@@ -1,5 +1,5 @@
 #include "State.h"
-
+#include <algorithm>
 
 State::State() {
     tiles = nullptr;
@@ -59,7 +59,7 @@ std::vector<State> State::expand(){
         newArray[emptyDestionation] = 0;
 
         State child(size, newArray);
-        child.parent = this;
+        child.parent = new State(*this);
 
         children.push_back(child);
     }
@@ -73,7 +73,7 @@ std::vector<State> State::expand(){
         newArray[emptyPos] = tiles[emptyDestionation];
         newArray[emptyDestionation] = 0;
         State child(size, newArray);
-        child.parent = this;
+        child.parent = new State(*this);
 
         children.push_back(child);
     }
@@ -87,7 +87,7 @@ std::vector<State> State::expand(){
         newArray[emptyPos] = tiles[emptyDestionation];
         newArray[emptyDestionation] = 0;
         State child(size, newArray);
-        child.parent = this;
+        child.parent = new State(*this);
 
         children.push_back(child);
     }
@@ -101,12 +101,26 @@ std::vector<State> State::expand(){
         newArray[emptyPos] = tiles[emptyDestionation];
         newArray[emptyDestionation] = 0;
         State child(size, newArray);
-        child.parent = this;
+        child.parent = new State(*this);
 
         children.push_back(child);
     }
-
+    for (State state : children)
+        if (state.parent == &state)
+            std::cout << "Jesus fuck\n";
     return children;
+}
+
+std::vector<State> State::path()
+{
+    std::vector<State> path;
+    State* temp = this;
+    while (temp->parent != nullptr) {
+        path.push_back(*temp);
+        temp = temp->parent;
+    }
+    //std::reverse(path.begin(), path.end());
+    return path;
 }
 
 std::string State::toString(){
@@ -120,6 +134,12 @@ std::string State::toString(){
     return ret;
 }
 
+State& State::operator=(const State& state)
+{
+    State n(state);
+    return n;
+}
+
 bool operator==(const State& lhs, const State& rhs)
 {
     return lhs.stringrepresentation == rhs.stringrepresentation;
@@ -128,17 +148,7 @@ bool operator<(const State& lhs, const State& rhs)
 {
     return lhs.stringrepresentation < rhs.stringrepresentation;
 }
-bool State::operator<(const State& rhs)
-{
-    return true;
-}
 
-
-State& State::operator=(const State& state)
-{
-    //do some copy stuff here
-    return *this;
-}
 
 bool State::moveUp()
 {
@@ -166,16 +176,4 @@ bool State::moveRight()
     if (emptyTile.x + 1 < size)
         return true;
     return false;
-}
-
-void State::testMoves(){
-    using namespace std;
-    if (moveUp())
-        cout << "Can move up" << endl;
-    if (moveDown())
-        cout << "Can move down" << endl;
-    if (moveLeft())
-        cout << "Can move left" << endl;
-    if (moveRight())
-        cout << "Can move right" << endl;
 }

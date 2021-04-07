@@ -4,7 +4,7 @@
 #include <string>
 class State
 {
-struct coordinates { int x; int y; };
+	struct coordinates { int x; int y; };
 
 private:
 public:
@@ -16,11 +16,12 @@ public:
 
 	State();
 	State(int dimensions, int* numbers);
-	State(const State&state);
+	State(const State& state);
 
 	~State();
 
 	std::vector<State> expand();
+	std::vector<State> path();
 	std::string toString();
 
 	bool isSolvable();
@@ -33,23 +34,20 @@ public:
 	bool operator < (const State& rhs);
 	friend bool operator == (const State& lhs, const State& rhs);
 	friend bool operator <(const State& lhs, const State& rhs);
+	friend bool operator != (const State& lhs, const State& rhs);
 
 	coordinates getEmptyTileCoordinates() { return emptyTile; }
 
 	void showEmptyTilesCoordinates() {
-		std::cout << std::to_string(emptyTile.x+1) + " ";
-		std::cout << emptyTile.y +1<< std::endl;
+		std::cout << std::to_string(emptyTile.x + 1) + " ";
+		std::cout << emptyTile.y + 1 << std::endl;
 	}
 
-	//Functions to check 
+	//Functions to check
 	bool moveUp();
 	bool moveDown();
 	bool moveLeft();
 	bool moveRight();
 
 	void testMoves();
-
-
-
 };
-
