@@ -12,8 +12,10 @@ public:
 	std::string stringrepresentation;
 	int* tiles;
 	int size = 0;
-	int heuristic;
+	int heuristic = 0;
+	int g;
 
+	std::string move;
 	State* parent;
 	State* goal;
 	coordinates emptyTile;
@@ -24,7 +26,7 @@ public:
 	~State();
 
 	std::vector<State> expand();
-	std::vector<State> path();
+	std::vector<State> getPath();
 	std::string toString();
 
 	bool isSolvable();

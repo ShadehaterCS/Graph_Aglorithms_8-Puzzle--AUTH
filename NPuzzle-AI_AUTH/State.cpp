@@ -7,6 +7,8 @@ State::State() {
 	parent = nullptr;
 	emptyTile = { 0,0 };
 	stringrepresentation = "";
+	g = 0;
+	heuristic = 0;
 }
 
 State::State(int size, int* numbers, State* goal) {
@@ -15,8 +17,9 @@ State::State(int size, int* numbers, State* goal) {
 	emptyTile = { 0,0 };
 	tiles = new int[size * size];
 	this->goal = goal;
-
+	g = 0;
 	heuristic = tilesOutOfPlace();
+
 	//puzzles are always NxN size
 	for (int i = 0; i < size * size; i++) {
 		tiles[i] = numbers[i];
@@ -37,6 +40,7 @@ State::State(const State& state) {
 	stringrepresentation = state.stringrepresentation;
 	goal = state.goal;
 	heuristic = tilesOutOfPlace();
+	g = state.g;
 
 	for (int i = 0; i < size * size; i++)
 		tiles[i] = state.tiles[i];
@@ -46,6 +50,9 @@ State::~State() {
 	delete[]tiles;
 }
 
+/*
+* tbd
+*/
 std::vector<State> State::expand() {
 	std::vector<State> children;
 
@@ -64,8 +71,9 @@ std::vector<State> State::expand() {
 
 		State child(size, newArray, goal);
 		child.parent = new State(*this);
-
+		child.g = g + 1;
 		children.push_back(child);
+		delete[] newArray;
 	}
 	if (moveDown()) {
 		int* newArray = new int[size * size];
@@ -78,8 +86,9 @@ std::vector<State> State::expand() {
 		newArray[emptyDestionation] = 0;
 		State child(size, newArray, goal);
 		child.parent = new State(*this);
-
+		child.g = g + 1;
 		children.push_back(child);
+		delete[] newArray;
 	}
 	if (moveLeft()) {
 		int* newArray = new int[size * size];
@@ -92,8 +101,9 @@ std::vector<State> State::expand() {
 		newArray[emptyDestionation] = 0;
 		State child(size, newArray, goal);
 		child.parent = new State(*this);
-
+		child.g = g + 1;
 		children.push_back(child);
+		delete[] newArray;
 	}
 	if (moveRight()) {
 		int* newArray = new int[size * size];
@@ -107,27 +117,37 @@ std::vector<State> State::expand() {
 
 		State child(size, newArray, goal);
 		child.parent = new State(*this);
+		child.g = g + 1;
 
 		children.push_back(child);
+		delete[] newArray;
 	}
+
 	for (State state : children)
 		if (state.parent == &state)
 			std::cout << "Jesus fuck\n";
 	return children;
 }
-
-std::vector<State> State::path()
-{
+/*
+* Goes upwards from the solution towards the starting state and
+* @returns a reversed vector of the States that lead to the solution
+*/
+std::vector<State> State::getPath(){
 	std::vector<State> path;
 	State* temp = this;
 	while (temp->parent != nullptr) {
 		path.push_back(*temp);
 		temp = temp->parent;
 	}
-	//std::reverse(path.begin(), path.end());
+	//for root node
+	path.push_back(*temp);
+
+	std::reverse(path.begin(), path.end());
 	return path;
 }
-
+/*
+* @returns a 'beauty' mode string representation of the internal array
+*/
 std::string State::toString() {
 	std::string ret;
 	for (int y = 0; y < size; y++) {
@@ -147,12 +167,14 @@ State& State::operator=(const State& state) {
 	stringrepresentation = state.stringrepresentation;
 	goal = state.goal;
 	heuristic = tilesOutOfPlace();
+	g = state.g;
 
 	for (int i = 0; i < size * size; i++)
 		tiles[i] = state.tiles[i];
 
 	return *this;
 }
+
 bool operator==(const State& lhs, const State& rhs) {
 	return lhs.stringrepresentation == rhs.stringrepresentation;
 }
@@ -161,7 +183,10 @@ bool operator<(const State& lhs, const State& rhs) {
 	return lhs.stringrepresentation < rhs.stringrepresentation;
 }
 
-//heuristic value function
+/*
+* Simple heuristic function, returns the tiles that are out of place
+* Most accurate measurement, since it directly shows at least how many moves must be made in order to reach the goal state
+*/
 int const State::tilesOutOfPlace() {
 	if (goal == nullptr)
 		return 0;
