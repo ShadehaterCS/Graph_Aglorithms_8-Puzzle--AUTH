@@ -9,10 +9,10 @@ namespace shd {
 			return front();
 		}
 	};
-	
+
 	/*
 	* Custom comparator for State objects
-	* Using > because a higher heuristic value means that solution is worse
+	* Using > because a higher heuristic value means that the solution is worse
 	*
 	*/
 	struct StateComparator {
@@ -24,8 +24,8 @@ namespace shd {
 	* Created for easier use in other parts of the code
 	*/
 	class PriorityQueue : public std::priority_queue<State, std::vector<State>, StateComparator> {};
-	
-	//Use for A* algorithm
+
+	//Used for A* algorithm as its ranking goes f(x) = g(x) + h(x)
 	struct AStar_StateComparator {
 		bool operator()(State& lhs, State& rhs) {
 			return (lhs.g + lhs.heuristic) > (rhs.g + rhs.heuristic);
@@ -33,5 +33,4 @@ namespace shd {
 	};
 
 	class AStarPriorityQueue : public std::priority_queue<State, std::vector<State>, AStar_StateComparator> {};
-
 }

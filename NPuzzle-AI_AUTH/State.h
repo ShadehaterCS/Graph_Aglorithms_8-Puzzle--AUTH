@@ -4,21 +4,22 @@
 #include <string>
 class State
 {
-	//Used to store the empty tile's position in the array 
+	//Used to store the empty tile's position in the array
 	struct coordinates { int x; int y; };
 
 private:
 public:
+	coordinates emptyTile;
 	std::string stringrepresentation;
 	int* tiles;
 	int size = 0;
 	int heuristic = 0;
 	int g;
-
 	std::string move;
-	State* parent;
-	State* goal;
-	coordinates emptyTile;
+
+	State* parent = nullptr;
+	State* goal = nullptr;
+	
 
 	State();
 	State(int dimensions, int* numbers, State* goal);
@@ -29,28 +30,15 @@ public:
 	std::vector<State> getPath();
 	std::string toString();
 
-	bool isSolvable();
-
 	//heuristic calculation
 	int const tilesOutOfPlace();
 
 	//Operator overloads
 	State& operator = (const State& state);
-	bool operator < (const State& rhs);
 	friend bool operator == (const State& lhs, const State& rhs);
 	friend bool operator <(const State& lhs, const State& rhs);
-	friend bool operator > (const State& lhs, const State& rhs) {
-		return lhs.heuristic < rhs.heuristic;
-	}
 
-	coordinates getEmptyTileCoordinates() { return emptyTile; }
-
-	void showEmptyTilesCoordinates() {
-		std::cout << std::to_string(emptyTile.x + 1) + " ";
-		std::cout << emptyTile.y + 1 << std::endl;
-	}
-
-	//Functions to check
+	//Functions to check available moves
 	bool moveUp();
 	bool moveDown();
 	bool moveLeft();
